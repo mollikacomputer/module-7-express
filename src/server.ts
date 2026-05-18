@@ -19,7 +19,7 @@ const initDB = async ()=>{
       CREATE TABLE IF NOT EXISTS users(
       id SERIAL PRIMARY KEY,
       name VARCHAR(20),
-      email VARCHAR(20) NOT NULL,
+      email VARCHAR(50) UNIQUE NOT NULL,
       password VARCHAR(20) NOT NULL,
       is_active BOOLEAN DEFAULT true,
       age INT,
@@ -49,8 +49,8 @@ app.get('/', (req : Request, res : Response) => {
   res.send({'message': 'Express server', 'Author':'Mollika Computer'})
 });
 
-//2 post
-app.post('/', async(req:Request, res: Response)=>{
+//2 post api
+app.post('/api/users', async(req:Request, res: Response)=>{
   // console.log(req.body)
   // const body = req.body;
   const {name, email, password, age} = req.body;
@@ -69,6 +69,23 @@ app.post('/', async(req:Request, res: Response)=>{
   })
 });
 
+// get api
+app.get('/api/users', async(req:Request, res: Response)=>{
+  try {
+    const result = await pool.query(` SELECT * FROM USERS`)
+    res.status(200).json({
+      success: true,
+      message: "Users retrived successfully!",
+      data: result.rows,
+    })
+  } catch (error: any) {
+    res.status(500).json({
+      success:false,
+      message:error.message,
+      error:error,
+    })
+  }
+})
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 });
